@@ -1,15 +1,19 @@
 ﻿cmake_minimum_required(VERSION 3.8)
 
+set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")
+
 project(brainfuck
         LANGUAGES C
         VERSION 2.7.3
         DESCRIPTION "Brainfuck interpreter written in C")
 
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=rv32i -mabi=ilp32 -mcmodel=medlow -ffunction-sections -fdata-sections -fno-builtin-printf -fno-builtin-malloc ")
+
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 
 ## Compile-time options ##
-option(ENABLE_CLI "Enable the command line interface" ON)
-option(ENABLE_EDITLINE "Enable GNU readline functionality provided by the editline library" ON)
+option(ENABLE_CLI "Enable the command line interface")
+option(ENABLE_EDITLINE "Enable GNU readline functionality provided by the editline library")
 option(ENABLE_EXTENSION_DEBUG "Enable the debug extension for brainfuck")
 option(INSTALL_EXAMPLES "Install the examples")
 
@@ -59,13 +63,16 @@ endif()
 include(GNUInstallDirs)
 
 install(TARGETS brainfuck
-        EXPORT brainfuck-config)
+        EXPORT brainfuck-config
+	ARCHIVE DESTINATION lib
+	)
 install(EXPORT brainfuck-config
         NAMESPACE brainfuck::
-        DESTINATION "${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}/cmake")
+	DESTINATION "${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}/cmake")
 
 if (ENABLE_CLI)
-    install(TARGETS brainfuck-cli)
+    install(TARGETS brainfuck-cli
+	    RUNTIME DESTINATION bin)
     install(FILES man/brainfuck.1 DESTINATION "share/man/man1")
 endif()
 
